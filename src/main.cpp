@@ -34,22 +34,17 @@ std::ostream& operator << (std::ostream& stream, const Average::Point& p) {
 }
 
 std::ostream& operator << (std::ostream& stream, const Average& a) {
+	stream << a.getDataSize() << ": ";
+
 	stream << "{ ";
-
-	stream << "i: " << a.getDataSize() << ", ";
 	stream << "v: " << sqrt(a.getVariance()) << ", ";
-
 
 	const Average::PointComponents c = a.getComponents();
 	for (Average::PointComponents::const_iterator i = c.begin(), end = c.end(); i != end; ++i) {
 		stream << i->first << ": [ " << i->second << " ], ";
 	}
 
-	// stream << "mean: [ " << a.getMean() << " ], ";
-	// stream << "min: [ " << a.getMin() << " ], ";
-	// stream << "max: [ " << a.getMax() << " ] ";
-
-	stream << "} " << std::endl;
+	stream << "}" << std::endl;
 
 	return stream;
 }
