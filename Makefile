@@ -1,23 +1,35 @@
+# Running average command line util build file
 
 PROJECT = average
-CFLAGS = -Wall
-CXXFLAGS = `pkg-config --cflags eigen3`
+CXXFLAGS = -Wall
+CXXFLAGS += `pkg-config --cflags eigen3`
 LIBS = `pkg-config --libs eigen3`
 
-SRC = $(wildcard src/*.cpp)
-OBJS = $(SRC:src/%.cpp=build/%.o)
+SRC_DIR = src
+OBJ_DIR = build
+BIN_DIR = bin
 
-all: ${PROJECT} 
+SRC = $(wildcard $(SRC_DIR)/*.cpp)
+OBJS = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-build/:
+
+.PHONY: clean
+
+all: $(PROJECT)
+
+$(OBJ_DIR):
 	@mkdir -p "$@"
 
-${PROJECT}: $(OBJS)
-	g++ -o ${PROJECT} $(OBJS) $(LIBS) 
-	
-build/%.o: src/%.cpp build/
-	g++ -c $(CFLAGS) $(CXXFLAGS) -o "$@" "$<"
+$(BIN_DIR):
+	@mkdir -p "$@"
 
+$(PROJECT): $(OBJS)
+	$(CXX) -o $(PROJECT) $(OBJS) $(LIBS) 
+	
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(OBJ_DIR) $(BIN_DIR)
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) -o "$@" "$<"
+
+.PHONY: clean
 clean:
-	rm $(OBJS) ${PROJECT}
+	$(RM) -f $(OBJS) $(PROJECT) $(BIN_DIR)/*
 

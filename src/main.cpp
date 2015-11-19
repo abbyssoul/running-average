@@ -10,11 +10,16 @@
 #include <cstring>
 
 #include <iostream>
+#include <memory>
 
 #include "average.hpp"
 
+
 typedef unsigned int uint;
-typedef Average_<float> Average;
+typedef float	DataType;
+typedef Average_<DataType> Average;
+typedef ExponentialMovingAverage_<DataType> ExponentialMovingAverage;
+
 
 std::ostream& operator << (std::ostream& stream, const Average::Point& p) {
 	for (Average::Point::Index i = 0; i < p.size(); ++i) {
@@ -34,9 +39,15 @@ std::ostream& operator << (std::ostream& stream, const Average& a) {
 	stream << "i: " << a.getDataSize() << ", ";
 	stream << "v: " << sqrt(a.getVariance()) << ", ";
 
-	stream << "mean: [ " << a.getMean() << " ], ";
-	stream << "min: [ " << a.getMin() << " ], ";
-	stream << "max: [ " << a.getMax() << " ] ";
+
+	const Average::PointComponents c = a.getComponents();
+	for (Average::PointComponents::const_iterator i = c.begin(), end = c.end(); i != end; ++i) {
+		stream << i->first << ": [ " << i->second << " ], ";
+	}
+
+	// stream << "mean: [ " << a.getMean() << " ], ";
+	// stream << "min: [ " << a.getMin() << " ], ";
+	// stream << "max: [ " << a.getMax() << " ] ";
 
 	stream << "} " << std::endl;
 
@@ -46,6 +57,8 @@ std::ostream& operator << (std::ostream& stream, const Average& a) {
 int main(int argc, const char* argv[]) {
 
 	size_t dimentions = 1;
+	DataType expLambda = 0;
+	bool expGiven = false;
 
 	for (int arg = 1; arg < argc; ++arg) {
 
@@ -53,20 +66,38 @@ int main(int argc, const char* argv[]) {
 			strcmp(argv[arg], "--dim") == 0) {
 			if (arg + 1 >= argc) {
 				std::cerr << "Expecting an argument after '" << argv[arg] << "', abort" << std::endl;
+
 				exit(EXIT_FAILURE);
 			} else {
 				dimentions = atoi(argv[arg + 1]);
 			}
 
 			arg++;
-		} else {
+		} else if ( strcmp(argv[arg], "-e") == 0 ||
+					strcmp(argv[arg], "--exp") == 0) {
+			if (arg + 1 >= argc) {
+				std::cerr << "Expecting an argument after '" << argv[arg] << "', abort" << std::endl;
+
+				exit(EXIT_FAILURE);
+			} else {
+				expLambda = atof(argv[arg + 1]);
+				expGiven = true;
+			}
+
+			arg++;
+		 } else {
 			std::cerr << "Unexpected argument '" << argv[arg] << "', abort" << std::endl;
+
 			exit(EXIT_FAILURE);
 		}
 	}
 
-	Average average(dimentions);
 	Average::Point datum_point(dimentions);
+	std::auto_ptr<Average> average(expGiven 
+									? new ExponentialMovingAverage(dimentions, expLambda) 
+									: new Average(dimentions)
+								);
+	// Average average(dimentions);
 
 	while (std::cin) {
 
@@ -75,8 +106,8 @@ int main(int argc, const char* argv[]) {
 		}
 
 		if (std::cin) {
-			average.addPoint(datum_point);
-			std::cout << average;
+			average->addPoint(datum_point);
+			std::cout << *average;
 		}
 	}
 
