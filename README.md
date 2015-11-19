@@ -78,5 +78,14 @@ With '-d 2' the same input will be interpreted as a list of 2d values.
 
 where VALUE is the 'waight of the recent observation' and not the waight of the accumulated summ (which is (1-VALUE)) as in some other sources.
 
+
+### Getting summary
+If you only interested in final value and not in the intermediate output you can add '-s' or '--summary' option:
+```
+> echo 1 2 3 4 5 5 5 5 5 5 5 3 2 1 | ./average --exp 0.9 --summary
+14: { v: 1.59842, emp: [ 1.112 ], max: [ 5 ], mean: [ 3.64286 ], min: [ 0 ], }
+
+```
+
 ## Contributing
 This is trivial but hopefully usefull command line tool. If you find it usefull please fill free to contribute

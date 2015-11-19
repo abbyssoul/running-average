@@ -51,9 +51,11 @@ std::ostream& operator << (std::ostream& stream, const Average& a) {
 
 int main(int argc, const char* argv[]) {
 
+	// Command line options
 	size_t dimentions = 1;
 	DataType expLambda = 0;
 	bool expGiven = false;
+	bool summaryOnly = false;
 
 	for (int arg = 1; arg < argc; ++arg) {
 
@@ -68,8 +70,8 @@ int main(int argc, const char* argv[]) {
 			}
 
 			arg++;
-		} else if ( strcmp(argv[arg], "-e") == 0 ||
-					strcmp(argv[arg], "--exp") == 0) {
+		} else if (strcmp(argv[arg], "-e") == 0 ||
+				   strcmp(argv[arg], "--exp") == 0) {
 			if (arg + 1 >= argc) {
 				std::cerr << "Expecting an argument after '" << argv[arg] << "', abort" << std::endl;
 
@@ -80,6 +82,9 @@ int main(int argc, const char* argv[]) {
 			}
 
 			arg++;
+		} else if (strcmp(argv[arg], "-s") == 0 ||
+				   strcmp(argv[arg], "--summary") == 0) {
+			summaryOnly = true;
 		 } else {
 			std::cerr << "Unexpected argument '" << argv[arg] << "', abort" << std::endl;
 
@@ -92,8 +97,6 @@ int main(int argc, const char* argv[]) {
 									? new ExponentialMovingAverage(dimentions, expLambda) 
 									: new Average(dimentions)
 								);
-	// Average average(dimentions);
-
 	while (std::cin) {
 
 		for (Average::Point::Index i = 0; i < datum_point.size() && std::cin; ++i) {
@@ -102,8 +105,15 @@ int main(int argc, const char* argv[]) {
 
 		if (std::cin) {
 			average->addPoint(datum_point);
-			std::cout << *average;
+
+			if (!summaryOnly) {
+				std::cout << *average;
+			}
 		}
+	}
+
+	if (summaryOnly) {
+		std::cout << *average;
 	}
 
 	return EXIT_SUCCESS;
