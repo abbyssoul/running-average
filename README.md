@@ -1,8 +1,8 @@
-# running-average
-Compute running average reading from standard input stream
+# Running-average
+Compute running average of the input data
 
 ## Description 
-This is a simple command line utility to compute a [https://en.wikipedia.org/wiki/Moving_average running average] of the input data.
+This is a simple command line utility to compute a [running average](https://en.wikipedia.org/wiki/Moving_average) of the input data.
 The tool is designed to be used in scripts and reads data from standard input and writes output into standard output.
 
 Currently two algorithms are implemented: 
